@@ -1,5 +1,6 @@
-# Linguaggi-Formali-e-Traduttori
-Progetto d'esame realizzato per il corso di Linguaggi Formali e Traduttori a.a. 2021/2022 (Università degli Studi di Torino)
+# LINGUAGGI FORMALI E TRADUTTORI (LFT)
+
+###### Progetto d'esame realizzato per il corso di Linguaggi Formali e Traduttori a.a. 2021/2022 
 
 ![LFT_Lab2122_page-0001](https://user-images.githubusercontent.com/61294929/173155887-213957d5-3b88-44e7-b0eb-470371558bc3.jpg)
 ![LFT_Lab2122_page-0002](https://user-images.githubusercontent.com/61294929/173155894-cd859234-b2cf-4482-9e0a-e30aa4c3538a.jpg)
