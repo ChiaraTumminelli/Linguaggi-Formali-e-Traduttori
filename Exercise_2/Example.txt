@@ -1,10 +1,9 @@
 /* Calcolare la velocita' */
-assign 300 to d;    // distanza
-print(* {d t}) 
-if(> x y) assign 0 to x else assign 0 to y
-while (ifs<=printread) assign ifs+1 to ifs
-5+;
-(34+26(-(2+15-(27
+assign 300 to d;    //distanza
+assign 10 to d;     //tempo
+assign 10 to t;
+print (* d t)
+
 
 
 
