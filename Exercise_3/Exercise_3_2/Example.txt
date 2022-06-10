@@ -1,10 +1,9 @@
-	read(x);
-	read(y);
-	cond	
-		when (> x y) do print(x) else print(y);
-	while (> x 0) {
-		= x - x 1;
-		print(x)
-	}
+read(x,y,z);
+if (> x y)
+	if (> x z) print(x) else print(z) end
+else
+	if (> y z) print(y) else print(z) end
+end 
+
 
 

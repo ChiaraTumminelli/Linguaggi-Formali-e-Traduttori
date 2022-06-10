@@ -11,101 +11,100 @@ public class Parser {
     private BufferedReader pbr;
     private Token look;
 
-    public Parser(Lexer l, BufferedReader br) {
+    public Parser (Lexer l, BufferedReader br){
         lex = l;
         pbr = br;
         move();
-    }
+    }    
 
-    void move() {
+    void move(){
         look = lex.lexical_scan(pbr);
-        System.out.println("token = " + look);
+        System.out.println("Token = " + look);
     }
 
-    void error(String s) {
-        throw new Error("near line " + Lexer.line + ": " + s);
+    void error (String s){
+        throw new Error ("Near line " + Lexer.line + ": " + s);
     }
 
-    void match(int t) {
-        if (look.tag == t) {
+    void match (int t){
+        if (look.tag == t){
             if (look.tag != Tag.EOF) move();
-        } else error("syntax error");
+        } else error ("Syntax error");
     }
 
-    // PREDICT(A->B) = FIRST(B) = {=,print,read,cond,while,{}
-    public void prog() {
+    // PREDICT(A -> B EOF) = FIRST(B) = { assign, print, read, while, if, {} 
+    public void prog(){
         switch(look.tag){
-            case '=':
+            
+            case Tag.ASSIGN:
             case Tag.PRINT:
             case Tag.READ:
-            case Tag.COND:
             case Tag.WHILE:
+            case Tag.IF:
             case '{':
                 statlist();
                 match(Tag.EOF);
                 break;
 
-            // If input is empty, it must not return an error
-            case Tag.EOF:
-                break;
-            
             default:
-                error("error in prog method");
+                error("Error in prog method");
+
         }
     }
 
-    // PREDICT(B->DC) = FIRST(D) = {=,print,read,cond,while,{}
-    public void statlist() {
+    //PREDICT(B -> DC) = FIRST(D) = { assign, print, read, while, if, { }
+    public void statlist(){
         switch(look.tag){
-            case '=':
+
+            case Tag.ASSIGN:
             case Tag.PRINT:
             case Tag.READ:
-            case Tag.COND:
             case Tag.WHILE:
+            case Tag.IF:
             case '{':
                 stat();
                 statlistp();
                 break;
-            
+
             default:
-                error("error in statlist method");       
+                error("Error in statlist method");
         }
     }
 
-    public void statlistp() {
+    
+    public void statlistp(){
         switch(look.tag){
-            
-            //PREDICT(C->;DC) = FIRST(;) = {;}
+
+            //PREDICT(C -> ;DC) = FIRST(;) = {;}
             case ';':
                 match(Token.semicolon.tag);
                 stat();
                 statlistp();
-                break;
-
-            //PREDICT(C->eps) = FOLLOW(C) = {$,}}
+                break;  
+                
+            //PREDICT(C -> eps) = FOLLOW(C) = { $, } }
             case Tag.EOF:
-                break;
-
             case '}':
                 break;
 
             default:
-                error("error in statlistp method");
+                error("Error in statlistp method");
 
         }
     }
 
-    public void stat() {
+    public void stat(){
         switch(look.tag){
 
-            // PREDICT(D->=IDI) = FIRST(=) = {=}
-            case '=':
-                match(Token.assign.tag);
-                match(Tag.ID);
+            //PREDICT(D -> assign H to E) = FIRST(assign) = { assign }
+            case Tag.ASSIGN:
+                match(Tag.ASSIGN);
                 expr();
+                match(Tag.TO);
+                idlist();
                 break;
 
-            // PREDICT(D->print(L)) = FIRST(print) = {print} 
+            //PREDICT(D -> print (I)) = FIRST(print) = { print }
             case Tag.PRINT:
                 match(Tag.PRINT);
                 match(Token.lpt.tag);
@@ -113,23 +112,15 @@ public class Parser {
                 match(Token.rpt.tag);
                 break;
 
-            // PREDICT(D->read(ID)) = FIRST(read) = {read}
+            //PREDICT(D -> read (E) ) = FIRST(read) = { read }
             case Tag.READ:
                 match(Tag.READ);
                 match(Token.lpt.tag);
-                match(Tag.ID);
+                idlist();
                 match(Token.rpt.tag);
                 break;
 
-            // PREDICT(D->cond E else D) = FIRST(cond) = {cond}
-            case Tag.COND:
-                match(Tag.COND);
-                whenlist();
-                match(Tag.ELSE);
-                stat();
-                break;
-
-            // PREDICT(D->while(H)D) = FIRST(while) = {while}
+            //PREDICT(D -> while (G) D) = FIRST(while) = { while }
             case Tag.WHILE:
                 match(Tag.WHILE);
                 match(Token.lpt.tag);
@@ -138,71 +129,94 @@ public class Parser {
                 stat();
                 break;
 
-            // PREDICT(D->{B}) = FIRST({B}) = FIRST({) = {{}
+            //PREDICT(D -> if (G) D P ) = FIRST(if) = { if }
+            case Tag.IF:
+                match(Tag.IF);
+                match(Token.lpt.tag);
+                bexpr();
+                match(Token.rpt.tag);
+                stat();
+                statp();
+                break; 
+
+            //PREDICT(D -> { B }) = FIRST({) = { { }
             case '{':
                 match(Token.lpg.tag);
                 statlist();
                 match(Token.rpg.tag);
-                break;
+                break; 
 
             default:
-                error("error in stat method");
+                error("Error in stat method");
 
         }
     }
 
-    // PREDICT(E->GF) = FIRST(G) = {when}
-    public void whenlist() {
-        switch(look.tag){
-            case Tag.WHEN:
-                whenitem();
-                whenlistp();
-                break;
-
-            default:
-                error("error in whenlist method");
-        }
-    }
-
-    public void whenlistp() {
+    public void statp(){
         switch(look.tag){
 
-            // PREDICT(F->GF) = FIRST(G) = {when}
-            case Tag.WHEN:
-                whenitem();
-                whenlistp();
+            //PREDICT(P -> end) = FIRST(end) = { end }
+            case Tag.END:
+                match(Tag.END);
                 break;
 
-            // PREDICT(F->eps) = FOLLOW(F) = {else}
+            //PREDICT(P -> else D end) = FIRST(else) = { else }
             case Tag.ELSE:
-                break;
-                
-            default:
-                error("error in whenlistp method");
-        }
-    }
-
-    // PREDICT(G->when(H) do D) = FIRST(when) = {when}
-    public void whenitem() {
-        switch(look.tag){
-            case Tag.WHEN:
-                match(Tag.WHEN);
-                match(Token.lpt.tag);
-                bexpr();
-                match(Token.rpt.tag);
-                match(Tag.DO);
+                match(Tag.ELSE);
                 stat();
+                match(Tag.END);
                 break;
 
             default:
-                error("error in whenitem method");
+                error("Error in statp method");
 
         }
     }
 
-    // PREDICT(H->RELOPII) = FIRST(RELOP) = {RELOP}
-    public void bexpr() {
+    //PREDICT(E -> MF) = FIRST(M) = { ID }
+    public void idlist(){
         switch(look.tag){
+
+            case Tag.ID:
+                match(Tag.ID);
+                idlistp();
+                break;
+
+            default:
+                error("Error in idlist method");
+            
+        }
+    }
+
+    public void idlistp(){
+        switch(look.tag){
+
+            //PREDICT(F -> ,MF) = FIRST(,) = {,}
+            case ',':
+                match(Token.comma.tag);
+                match(Tag.ID);
+                idlistp();
+                break;
+
+            //PREDICT(F -> eps) = FOLLOW(F) = { $, ;, ), end, else, } } 
+            case Tag.EOF:
+            case ';':
+            case ')':
+            case Tag.END:
+            case Tag.ELSE:
+            case '}':
+                break;
+
+            default:
+                error("Error in idlistp method");
+            
+        }
+    }
+
+    //PREDICT(G -> RELOPHH) = FIRST(RELOP) = { RELOP }
+    public void bexpr(){
+        switch(look.tag){
+
             case Tag.RELOP:
                 match(Tag.RELOP);
                 expr();
@@ -210,14 +224,15 @@ public class Parser {
                 break;
 
             default:
-                error("error in bexpr method");
+                error("Error in bexpr method");
+            
         }
     }
 
-    public void expr() {
+    public void expr(){
         switch(look.tag){
 
-            // PREDICT(I->+(L)) = FIRST(+) = {+}
+            //PREDICT(H -> +(I)) = FIRST(+) = { + }
             case '+':
                 match(Token.plus.tag);
                 match(Token.lpt.tag);
@@ -225,14 +240,14 @@ public class Parser {
                 match(Token.rpt.tag);
                 break;
 
-            // PREDICT(I->-II) = FIRST(-) = {-}
+            //PREDICT(H -> -HH) = FIRST(-) = { - }
             case '-':
                 match(Token.minus.tag);
                 expr();
                 expr();
                 break;
 
-            // PREDICT(I->*(L)) = FIRST(*) = {*}
+            //PREDICT(H -> *(I)) = FIRST(*) = { * }
             case '*':
                 match(Token.mult.tag);
                 match(Token.lpt.tag);
@@ -240,68 +255,66 @@ public class Parser {
                 match(Token.rpt.tag);
                 break;
 
-            // PREDICT(I->/II) = FIRST(/) = (/)
+            //PREDICT(H -> /HH) = FIRST(/) = { / }
             case '/':
                 match(Token.div.tag);
                 expr();
                 expr();
-                break;
+                break; 
 
-            // PREDICT(I->NUM) = FIRST(NUM) = {NUM}
+            //PREDICT(H -> NUM) = FIRST(NUM) = { NUM }
             case Tag.NUM:
                 match(Tag.NUM);
                 break;
 
-            // PREDICT(I->ID) = FIRST(ID) = {ID}
+            //PREDICT(H -> ID) = FIRST(ID) = { ID }
             case Tag.ID:
                 match(Tag.ID);
                 break;
 
             default:
-                error("error in expr method");
-
+                error("Error in expr method");
+ 
         }
     }
 
-    // PREDICT(L->IM) = FIRST(I) = {+,-,*,/,NUM,ID}
-    public void exprlist() {
+    //PREDICT(I -> HL) = FIRST(H) = { ID, +, -, *, / NUM } 
+    public void exprlist(){
         switch(look.tag){
+
+            case Tag.ID:
             case '+':
             case '-':
             case '*':
             case '/':
             case Tag.NUM:
-            case Tag.ID:
                 expr();
                 exprlistp();
                 break;
 
             default:
-                error("error in exprlist method");
-
+                error("Error in exprlist method");
+        
         }
     }
 
-    public void exprlistp() {
+    public void exprlistp(){
         switch(look.tag){
 
-            // PREDICT(M->IM) = FIRST(I) = {+,-,*,/,NUM,ID}
-            case '+':
-            case '-':
-            case '*':
-            case '/':
-            case Tag.NUM:
-            case Tag.ID:
+            //PREDICT(L -> ,HL) = FIRST(,) = { , }
+            case ',':
+                match(Token.comma.tag);
                 expr();
                 exprlistp();
                 break;
 
-            // PREDICT(M -> eps) = FOLLOW(M) = {)}
+            //PREDICT(L -> eps) = FOLLOW(L) = { ) }
             case ')':
                 break;
 
             default:
-                error("error in exprlistp method");
+                error("Error in exprlistp method");
+
         }
     }
 
@@ -309,15 +322,12 @@ public class Parser {
         Lexer lex = new Lexer();
         String path = "Exercise_3/Exercise_3_2/Example.txt"; 
         try {
-            BufferedReader br = new BufferedReader(new FileReader(path));
+        BufferedReader br = new BufferedReader(new FileReader(path));
             Parser parser = new Parser(lex, br);
             parser.prog();
             System.out.println("Input OK");
             br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) {e.printStackTrace();}
     }
-}
-
     
+}

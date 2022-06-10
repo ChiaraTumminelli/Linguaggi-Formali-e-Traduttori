@@ -1,28 +1,23 @@
 package Exercise_3.Exercise_3_1;
 
-import java.io.*;
+import java.io.*; 
 
+// Exercise 2.1
 public class Lexer {
 
     public static int line = 1;
     private char peek = ' ';
-
-    // Case of error 
+    
+    // Case of error
     private void readch(BufferedReader br) {
         try {
             peek = (char) br.read();
         } catch (IOException exc) {
-            peek = (char) -1; 
+            peek = (char) -1; // ERROR
         }
     }
 
-    // Case of error 
-    private Token wrongToken(String details) {
-        System.err.println("Illegal character detected: " + "(" + peek + ")" + " character was after " + "(" + details + ") character.");
-        return null;
-    }
-
-    // ... Method to be completed  ...
+    // ... Method to be completed ...
     public Token lexical_scan(BufferedReader br) {
         while (peek == ' ' || peek == '\t' || peek == '\n' || peek == '\r' || peek == '/') {
 
@@ -60,7 +55,8 @@ public class Lexer {
 
                     // If it finds EOF before the symbol '*/' then I have an error 
                     if (!c_close.equals("*/")) {
-                        return wrongToken("Missing multi-line comment close!");
+                        System.err.println("Missing multi-line comment close!");
+                        return null; 
                     }
                 }
 
@@ -74,13 +70,14 @@ public class Lexer {
 
         }
 
-        // Characters taken from the Token class 
-        switch (peek) {
 
+        // Characters taken from the Token class
+        switch (peek) {
+            
             case '!':
                 peek = ' ';
                 return Token.not;
-
+    
             case '(':
                 peek = ' ';
                 return Token.lpt;
@@ -113,78 +110,85 @@ public class Lexer {
                 peek = ' ';
                 return Token.semicolon;
 
-            // Early reading with double buffer and sentinels cases  
-            // Case of logical AND (&&)
+            case ',':
+                peek = ' ';
+                return Token.comma;
+    
+            // Characters taken from the Word class
+            // Early reading with double buffer and sentinels cases
+            // Case of logical OR
+            case '|':
+                readch(br);
+                if (peek == '|'){
+                    peek = ' ';
+                    return Word.or;
+                } else {
+                    System.out.println("Erroneous character" + " after | : " + peek);
+                    return null;
+                }
+
+            // Case of logical AND
             case '&':
                 readch(br);
                 if (peek == '&') {
                     peek = ' ';
                     return Word.and;
                 } else {
-                    return wrongToken("&");
-                }
-  
-            // Case of logical OR (||)
-            case '|':
-                readch(br);
-                if (peek == '|') {
-                    peek = ' ';
-                    return Word.or;
-                } else {
-                    return wrongToken("|");
-                }
-
-            //Case of = and case of ==
-            case '=':
-                readch(br);
-                if (peek == '=') {
-                  peek = ' ';
-                  return Word.eq;
-                } else if (peek != '=') {
-                  return Token.assign;
-                } else {
-                  return wrongToken("=");
+                    System.err.println("Erroneous character" + " after & : "  + peek );
+                    return null;
                 }
 
             // Case of <=, case of <> and case of <
             case '<':
                 readch(br);
-                if (peek == '=') {
-                    peek = ' ';
-                    return Word.le;
-                } else if (peek == '>') {
-                    peek = ' ';
-                    return Word.ne;
-                } else if (peek == ' ') {
+                if (peek == ' '){
                     peek = ' ';
                     return Word.lt;
+                } else if (peek == '='){
+                    peek = ' ';
+                    return Word.le;
+                } else if (peek == '>'){
+                    peek = ' ';
+                    return Word.ne;
                 } else {
-                    return wrongToken("<");
+                    System.out.println("Erroneous character" + " after < : " + peek);
+                    return null;
                 }
 
-            // Case of >= and case of >
+            // Case of > and case of >=
             case '>':
                 readch(br);
-                if (peek == '=') {
-                    peek = ' ';
-                    return Word.ge;
-                } else if (peek == ' ') {
+                if (peek == ' '){
                     peek = ' ';
                     return Word.gt;
+                } else if (peek == '='){
+                    peek = ' ';
+                    return Word.ge;
                 } else {
-                    return wrongToken(">");
+                    System.out.println("Erroneous character" + " after > : " + peek);
+                    return null;
                 }
 
-            // Case of End Of File
-            case (char) -1:
+            // Case of = and case of ==
+            case '=':
+                readch(br);
+                if (peek == '='){
+                    peek = ' ';
+                    return Word.eq;
+                } else {
+                    System.out.println("Erroneous character" + " after = : " + peek);
+                    return null;
+                }
+
+            // Case of End Of File (EOF)
+            case (char)-1:
                 return new Token(Tag.EOF);
 
+            // Exercise 2.2
             // Case of identifiers, keywords and values
             default:
                 String str = "";
 
-                // Exercise 2.2
-                // Case of identifiers and keywords
                 if (Character.isLetter(peek) || peek == '_') {
                     boolean valid_underscore = false;
                     str += peek;
@@ -200,7 +204,8 @@ public class Lexer {
                                 readch(br);
                             }
                             else if(!Character.isLetter(peek) && !Character.isDigit(peek)){
-                                return wrongToken("Only underscore var");
+                                System.err.println("Only underscore var");
+                                return null;     
                             }
                         }
                     } 
@@ -213,20 +218,20 @@ public class Lexer {
 
                     
                     switch (str) {
-                        case "cond":
-                            return Word.cond;
-                        case "when":
-                            return Word.when;
-                        case "then":
-                            return Word.then;
+                        case "assign":
+                            return Word.assign;
+                        case "to":
+                            return Word.to;
+                        case "if":
+                            return Word.iftok;
                         case "else":
                             return Word.elsetok;
                         case "while":
                             return Word.whiletok;
-                        case "do":
-                            return Word.dotok;
-                        case "seq":
-                            return Word.seq;
+                        case "begin":
+                            return Word.begin;
+                        case "end":
+                            return Word.end;
                         case "print":
                             return Word.print;
                         case "read":
@@ -235,10 +240,9 @@ public class Lexer {
                             return new Word(Tag.ID, str);
                     }
 
-                }
-
-                // Case of numbers
-                else if (Character.isDigit(peek)) {
+                } 
+                 // Case of numbers
+                 else if (Character.isDigit(peek)) {
 
                     str += peek;
                     readch(br);
@@ -249,13 +253,16 @@ public class Lexer {
 
                     // Check the last character read 
                     if (Character.isLetter(peek) || peek == '_') {
-                        return wrongToken("Illegal number pattern detected");
+                        System.err.println("Illegal number pattern detected");
+                        return null;
+
                     } else {
                         return new NumberTok(Tag.NUM, Integer.parseInt(str));
                     }
 
                 } else {
-                    return wrongToken("Unrecognised character detected");
+                    System.err.println("Unrecognised character detected");
+                    return null;
                 }
         }
     }
