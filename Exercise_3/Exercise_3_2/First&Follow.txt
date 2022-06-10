@@ -1,0 +1,72 @@
+A: <prog>           A -> B EOF
+B: <statlist>       B -> DC
+C: <statlistp>      C -> ;DC|eps                                                null(C)
+D: <stat>           D -> =IDI|print(L)|read(ID)|cond E else D|while(H)D|{B} 
+E: <whenlist>       E -> GF
+F: <whenlistp>      F -> GF|eps                                                 null(F)
+G: <whenitem>       G -> when(H) do D
+H: <bexpr>          H -> RELOPII 
+I: <expr>           I -> +(L)|-II|*(L)|/II|NUM|ID
+L: <exprlist>       L -> IM
+M: <exprlistp>      M -> IM|eps                                                 null(M)
+
+--------------------------------------------------------------------------------------
+
+FIRST(A) = FIRST(B) = {=,print,read,cond,while,{} 
+FIRST(B) = FIRST(DC) = FIRST(D) = {=,print,read,cond,while,{}
+FIRST(C) = FIRST(;DC) U FIRST(eps) = FIRST(;) = {;}
+FIRST(D) = FIRST(=IDI) U FIRST(print(L)) U FIRST(read(ID)) U FIRST(cond E else D) U FIRST(while(H)D) U FIRST({B}) = FIRST(=) U FIRST(print) U FIRST(read) U FIRST(cond) U FIRST(while) U FIRST({) = 
+           {=,print,read,cond,while,{}
+FIRST(E) = FIRST(GF) = FIRST(G) = {when}
+FIRST(F) = FIRST(GF) U FIRST(eps) = FIRST(G) = {when}
+FIRST(G) = FIRST(when(H) do D) = FIRST(when) = {when}
+FIRST(H) = FIRST(RELOP) U FIRST(I) U FIRST(I) = FIRST(RELOP) = {RELOP}
+FIRST(I) = FIRST(+(L)) U FIRST(-II) U FIRST(*(L)) U FIRST(/II) U FIRST(NUM) U FIRST(ID) = FIRST(+) U FIRST(-) U FIRST(*) U FIRST(/) U FIRST(NUM) U FIRST(ID) = 
+           {+,-,*,/,NUM,ID}
+FIRST(L) = FIRST(IM) = FIRST(I) = {=,-,*,/,NUM,ID}
+FIRST(M) = FIRST(IM) U FIRST(eps) = FIRST(I) = {+,-,*,/,NUM,ID}
+
+--------------------------------------------------------------------------------------
+
+FOLLOW(A) = {$}
+FOLLOW(B) = {$,}}
+FOLLOW(C) = {$,}}
+FOLLOW(D) = {$,;,else,},when}
+FOLLOW(E) = {else}
+FOLLOW(F) = {else}
+FOLLOW(G) = {else,when}
+FOLLOW(H) = {)}
+FOLLOW(I) = {$,;,),else,},when,+,-,*,/,NUM,ID}
+FOLLOW(L) = {)}
+FOLLOW(M) = {)}
+
+--------------------------------------------------------------------------------------
+
+PREDICT(A->B) = FIRST(B) = {=,print,read,cond,while,{}
+PREDICT(B->DC) = FIRST(D) = {=,print,read,cond,while,{}
+PREDICT(C->;DC) = FIRST(;) = {;}
+PREDICT(C->eps) = FOLLOW(C) = {$,}}
+PREDICT(D->=IDI) = FIRST(=) = {=}
+PREDICT(D->print(L)) = FIRST(print) = {print} 
+PREDICT(D->read(ID)) = FIRST(read) = {read}
+PREDICT(D->cond E else D) = FIRST(cond) = {cond}
+PREDICT(D->while(H)D) = FIRST(while) = {while}
+PREDICT(D->{B}) = FIRST({B}) = FIRST({) = {{}
+PREDICT(E->GF) = FIRST(G) = {when}
+PREDICT(F->GF) = FIRST(G) = {when}
+PREDICT(F->eps) = FOLLOW(F) = {else}
+PREDICT(G->when(H) do D) = FIRST(when) = {when}
+PREDICT(H->RELOPII) = FIRST(RELOP) = {RELOP}
+PREDICT(I->+(L)) = FIRST(+) = {+}
+PREDICT(I->-II) = FIRST(-) = {-}
+PREDICT(I->*(L)) = FIRST(*) = {*}
+PREDICT(I->/II) = FIRST(/) = (/)
+PREDICT(I->NUM) = FIRST(NUM) = {NUM}
+PREDICT(I->ID) = FIRST(ID) = {ID}
+PREDICT(L->IM) = FIRST(I) = {+,-,*,/,NUM,ID}
+PREDICT(M->IM) = FIRST(I) = {+,-,*,/,NUM,ID}
+PREDICT(M -> eps) = FOLLOW(M) = {)}
+
+--------------------------------------------------------------------------------------
+
+It is a LL(1) grammar, because intersections of predict sets are all empty. 
