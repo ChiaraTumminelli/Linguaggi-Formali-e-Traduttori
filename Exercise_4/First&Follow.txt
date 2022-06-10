@@ -1,0 +1,43 @@
+
+<start>     S -> E
+<expr>      E -> TE'
+<exprp>     E'-> +TE'|-TE'|eps      null(E')
+<term>      T -> FT'
+<termp>     T'-> *FT'|/FT'|eps      null(T')
+<fact>      F -> (E)|NUM
+
+--------------------------------------------------------------------------------------
+
+FIRST(S) = FIRST(E) = {(,NUM} 
+FIRST(E) = FIRST(TE') = FIRST(T) = {(,NUM} 
+FIRST(E') = FIRST(+TE') U FIRST(-TE') U FIRST(eps) = FIRST(+) U FIRST(-) = {+,-}
+FIRST(T) = FIRST(FT) = FIRST(F) = {(,NUM} 
+FIRST(T') = FIRST (*FT') U FIRST(\FT') U FIRST(eps) = FIRST(*) U FIRST(/) = {*,/}
+FIRST(F) = FIRST((E)) U FIRST(NUM) = FIRST(() U FIRST(NUM) = {(,NUM}
+
+--------------------------------------------------------------------------------------
+
+FOLLOW(S) = {$}
+FOLLOW(E) = {$,)} 
+FOLLOW(E') = {$,)}
+FOLLOW(T) = {$,+,-,)} 
+FOLLOW(T') = {$,+,-,)} 
+FOLLOW(F) = {$,+,-,*,/,)} 
+
+--------------------------------------------------------------------------------------
+
+PREDICT(S->E) = FIRST(E) = {(,NUM} 
+PREDICT(E->TE') = FIRST(T) = {(,NUM} 
+PREDICT(E'->+TE') = FIRST(+TE') = FIRST(+) = {+}
+PREDICT(E'->-TE') = FIRST(-TE') = FIRST(-) = {-}
+PREDICT(E'->eps) = FOLLOW(E') = {$,)}
+PREDICT(T -> FT') = FIRST(FT') = FIRST(F) = {(,NUM}
+PREDICT(T'->*FT') = FIRST(*FT') = FIRST(*) = {*}
+PREDICT(T'->/FT') = FIRST(/FT') = FIRST(/) = {/}
+PREDICT(T'->eps) = FOLLOW(T') = {$,+,-,)}  
+PREDICT(F->(E)) = FIRST((E)) = FIRST(() = {(}
+PREDICT(F->NUM) = FIRST(NUM) = {NUM}  
+
+--------------------------------------------------------------------------------------
+
+It is a LL(1) grammar, because intersections of predict sets are all empty. 
