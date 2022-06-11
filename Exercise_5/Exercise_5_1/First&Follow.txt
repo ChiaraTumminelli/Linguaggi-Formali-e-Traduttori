@@ -1,0 +1,149 @@
+A: <prog>              A -> B EOF
+B: <statlist>          B -> DC
+C: <statlistp>         C -> ;DC | eps                                                                                                   null(C)
+D: <stat>              D -> assign H to E | print (I) | read (E) | while (G) D | if (G) D end | if (G) D else D end | { B }
+E: <idlist>            E -> MF
+F: <idlistp>           F -> ,MF | eps                                                                                                   null(F)
+G: <bexpr>             G -> RELOPHH
+H: <expr>              H -> +(I) | -HH | *(I) | /HH | NUM | M 
+I: <exprlist>          I -> HL
+L: <exprlistp>         L -> ,HL | eps                                                                                                   null(L)
+
+                       con M = ID 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+FIRST(A) = { assign, print, read, while, if, { }
+FIRST(B) = { assign, print, read, while, if, { }
+FIRST(C) = { ; }
+FIRST(D) = { assign, print, read, while, if, { }
+FIRST(E) = { ID }
+FIRST(F) = { , }
+FIRST(G) = { RELOP }
+FIRST(H) = { ID, +, -, *, / NUM }
+FIRST(I) = { ID, +, -, *, / NUM }
+FIRST(L) = { , }
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+FOLLOW(A) = { $ } 
+FOLLOW(B) = { $, } } 
+FOLLOW(C) = { $, } } 
+FOLLOW(D) = { $, ;, end, else, } } 
+FOLLOW(E) = { $, ;, ), end, else, } } 
+FOLLOW(F) = { $, ;, ), end, else, } }  
+FOLLOW(G) = { ) } 
+FOLLOW(H) = { to, ), ID, ,, +, -, *, /, NUM } 
+FOLLOW(I) = { ) } 
+FOLLOW(L) = { ) } 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+PREDICT(A -> B) = FIRST(B) = { assign, print, read, while, if, { } 
+PREDICT(B -> DC) = FIRST(D) = { assign, print, read, while, if, { } 
+PREDICT(C -> ;DC) = FIRST(;) = {;}
+PREDICT(C -> eps) = FOLLOW(C) = { $, } }
+PREDICT(D -> assign H to E) = FIRST(assign) = { assign }
+PREDICT(D -> print (I)) = FIRST(print) = { print }
+PREDICT(D -> read (E) ) = FIRST(read) = { read }
+PREDICT(D -> while (G) D) = FIRST(while) = { while }
+PREDICT(D -> if (G) D end ) = FIRST(if) = { if }
+PREDICT(D -> if (G) D else D end) = FIRST(if) = { if }
+PREDICT(D -> { B }) = FIRST({) = { { }
+PREDICT(E -> MF) = FIRST(M) = { ID }
+PREDICT(F -> ,MF) = FIRST(,) = {,}
+PREDICT(F -> eps) = FOLLOW(F) = { $, ;, ), end, else, } } 
+PREDICT(G -> RELOPHH) = FIRST(RELOP) = { RELOP }
+PREDICT(H -> +(I)) = FIRST(+) = { + }
+PREDICT(H -> -HH) = FIRST(-) = { - }
+PREDICT(H -> *(I)) = FIRST(*) = { * }
+PREDICT(H -> /HH) = FIRST(/) = { / }
+PREDICT(H -> NUM) = FIRST(NUM) = { NUM }
+PREDICT(H -> ID) = FIRST(ID) = { ID }
+PREDICT(I -> HL) = FIRST(H) = { ID, +, -, *, / NUM } 
+PREDICT(L -> ,HL) = FIRST(,) = { , }
+PREDICT(L -> eps) = FOLLOW(L) = { ) }
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+It is not a LL(1) grammar, because intersections of predict sets are not all empty. 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+To turn the grammar into an LL(1) grammar I added a new production P. ( <-- statp )
+
+A: <prog>              A -> B EOF
+B: <statlist>          B -> DC
+C: <statlistp>         C -> ;DC | eps                                                                                                   null(C)
+D: <stat>              D -> assign H to E | print (I) | read (E) | while (G) D | if (G) D P | { B }
+P: <statp>             P -> end | else D end             
+E: <idlist>            E -> MF
+F: <idlistp>           F -> ,MF | eps                                                                                                   null(F)
+G: <bexpr>             G -> RELOPHH
+H: <expr>              H -> +(I) | -HH | *(I) | /HH | NUM | M 
+I: <exprlist>          I -> HL
+L: <exprlistp>         L -> ,HL | eps                                                                                                   null(L)
+
+                       con M = ID 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+FIRST(A) = { assign, print, read, while, if, { }
+FIRST(B) = { assign, print, read, while, if, { }
+FIRST(C) = { ; }
+FIRST(D) = { assign, print, read, while, if, { }
+FIRST(P) = { end, else }
+FIRST(E) = { ID }
+FIRST(F) = { , }
+FIRST(G) = { RELOP }
+FIRST(H) = { ID, +, -, *, / NUM }
+FIRST(I) = { ID, +, -, *, / NUM }
+FIRST(L) = { , }
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+FOLLOW(A) = { $ } 
+FOLLOW(B) = { $, } } 
+FOLLOW(C) = { $, } } 
+FOLLOW(D) = { $, ;, end, else, } }
+FOLLOW(P) = { $, ;, end, else, } } 
+FOLLOW(E) = { $, ;, ), end, else, } } 
+FOLLOW(F) = { $, ;, ), end, else, } }  
+FOLLOW(G) = { ) } 
+FOLLOW(H) = { to, ), ID, ,, +, -, *, /, NUM } 
+FOLLOW(I) = { ) } 
+FOLLOW(L) = { ) } 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+PREDICT(A -> B) = FIRST(B) = { assign, print, read, while, if, { } 
+PREDICT(B -> DC) = FIRST(D) = { assign, print, read, while, if, { } 
+PREDICT(C -> ;DC) = FIRST(;) = {;}
+PREDICT(C -> eps) = FOLLOW(C) = { $, } }
+PREDICT(D -> assign H to E) = FIRST(assign) = { assign }
+PREDICT(D -> print (I)) = FIRST(print) = { print }
+PREDICT(D -> read (E) ) = FIRST(read) = { read }
+PREDICT(D -> while (G) D) = FIRST(while) = { while }
+PREDICT(D -> if (G) D P ) = FIRST(if) = { if }
+PREDICT(D -> { B }) = FIRST({) = { { }
+PREDICT(P -> end) = FIRST(end) = { end }
+PREDICT(P -> else D end) = FIRST(else) = { else }
+PREDICT(E -> MF) = FIRST(M) = { ID }
+PREDICT(F -> ,MF) = FIRST(,) = {,}
+PREDICT(F -> eps) = FOLLOW(F) = { $, ;, ), end, else, } } 
+PREDICT(G -> RELOPHH) = FIRST(RELOP) = { RELOP }
+PREDICT(H -> +(I)) = FIRST(+) = { + }
+PREDICT(H -> -HH) = FIRST(-) = { - }
+PREDICT(H -> *(I)) = FIRST(*) = { * }
+PREDICT(H -> /HH) = FIRST(/) = { / }
+PREDICT(H -> NUM) = FIRST(NUM) = { NUM }
+PREDICT(H -> ID) = FIRST(ID) = { ID }
+PREDICT(I -> HL) = FIRST(H) = { ID, +, -, *, / NUM } 
+PREDICT(L -> ,HL) = FIRST(,) = { , }
+PREDICT(L -> eps) = FOLLOW(L) = { ) }
+
+--------------------------------------------------------------------------------------
+
+It is a LL(1) grammar, because intersections of predict sets are all empty. 
+
+
