@@ -11,6 +11,10 @@ public class Translator {
     private BufferedReader pbr;
     private Token look;
 
+    public final static int READ_VAR = 0;
+    public final static int PRINT_VAR = 1;
+    public final static int ASSIGN_VAR = 2;
+
     SymbolTable st = new SymbolTable();
     CodeGenerator code = new CodeGenerator();
     int count = 0;
@@ -119,7 +123,7 @@ public class Translator {
                 match(Tag.ASSIGN);
                 expr();
                 match(Tag.TO);
-                idlist(2);
+                idlist(ASSIGN_VAR);
                 code.emit(OpCode.GOto, lnext);
                 break;
 
@@ -136,7 +140,7 @@ public class Translator {
             case Tag.READ:
                 match(Tag.READ);
                 match(Token.lpt.tag);
-                idlist(0);
+                idlist(READ_VAR);
                 match(Token.rpt.tag);
                 code.emit(OpCode.GOto, lnext);
                 break;
@@ -241,9 +245,9 @@ public class Translator {
                         st.insert(((Word)look).lexeme,count++);
                     }
                     match(Tag.ID);
-                    if (readMode == 0){
-                        code.emit(OpCode.invokestatic,0);
-                    } else if (readMode == 2){
+                    if (readMode == READ_VAR){
+                        code.emit(OpCode.invokestatic,READ_VAR);
+                    } else if (readMode == ASSIGN_VAR){
                         code.emit(OpCode.dup);
                     }
                     code.emit(OpCode.istore,previousVarAddress);
@@ -258,8 +262,8 @@ public class Translator {
             case Tag.END:
             case Tag.ELSE:
             case '}':
-                if (readMode == 0){
-                    code.emit(OpCode.invokestatic, 0);
+                if (readMode == READ_VAR){
+                    code.emit(OpCode.invokestatic, READ_VAR);
                 }
                 code.emit(OpCode.istore, previousVarAddress);
                 break;
@@ -402,7 +406,7 @@ public class Translator {
             case Tag.NUM:
                 expr();
                 if (pcode == OpCode.invokestatic){
-                    code.emit(OpCode.invokestatic, 1);
+                    code.emit(OpCode.invokestatic, PRINT_VAR);
                 }
                 exprlistp(pcode);
                 break;
@@ -423,7 +427,7 @@ public class Translator {
                 if (pcode == OpCode.iadd || pcode == OpCode.imul){
                     code.emit(pcode);
                 } else if (pcode == OpCode.invokestatic){
-                    code.emit(OpCode.invokestatic,1);
+                    code.emit(OpCode.invokestatic,PRINT_VAR);
                 }
                 exprlistp(pcode);
                 break;
