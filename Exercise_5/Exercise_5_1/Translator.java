@@ -41,6 +41,7 @@ public class Translator {
     }
 
     // PREDICT(A -> B EOF) = FIRST(B) = { assign, print, read, while, if, {} 
+    // <prog> :== {statlist.next = newLabel()} <statlist> {emitLabel(statlist.next)} EOF
     public void prog(){
         switch(look.tag){
             
@@ -50,7 +51,7 @@ public class Translator {
             case Tag.WHILE:
             case Tag.IF:
             case '{':
-                int lnext_prog = code.newLabel();
+                int lnext_prog = code.newLabel();                                   
                 statlist(lnext_prog);
                 code.emitLabel(lnext_prog);
                 match(Tag.EOF);
@@ -69,7 +70,8 @@ public class Translator {
         }
     }
 
-    //PREDICT(B -> DC) = FIRST(D) = { assign, print, read, while, if, { }
+    // PREDICT(B -> DC) = FIRST(D) = { assign, print, read, while, if, { }
+    // <statlist> ::= {stat.next = newLabel()} <stat> {emitLabel(stat.next)} <statlistp> {emit(GOto)}
     public void statlist(int lnext){
         switch(look.tag){
 
@@ -95,7 +97,8 @@ public class Translator {
     public void statlistp(){
         switch(look.tag){
 
-            //PREDICT(C -> ;DC) = FIRST(;) = {;}
+            // PREDICT(C -> ;DC) = FIRST(;) = {;}
+            // <statlistp> ::= ; {stat.next = newLabel()} <stat> {emitLabel(stat.next)} <statlistp>
             case ';':
                 match(Token.semicolon.tag);
                 int lnext_stat = code.newLabel();
@@ -104,7 +107,8 @@ public class Translator {
                 statlistp();
                 break;  
                 
-            //PREDICT(C -> eps) = FOLLOW(C) = { $, } }
+            // PREDICT(C -> eps) = FOLLOW(C) = { $, } }
+            // <statlistp> ::= eps
             case Tag.EOF:
             case '}':
                 break;
@@ -118,7 +122,8 @@ public class Translator {
     public void stat(int lnext){
         switch(look.tag){
 
-            //PREDICT(D -> assign H to E) = FIRST(assign) = { assign }
+            // PREDICT(D -> assign H to E) = FIRST(assign) = { assign }
+            // <stat> ::= assign <expr> to {idlist_var = assign_var} <idlist> {emit(GOto)}
             case Tag.ASSIGN:
                 match(Tag.ASSIGN);
                 expr();
@@ -127,7 +132,8 @@ public class Translator {
                 code.emit(OpCode.GOto, lnext);
                 break;
 
-            //PREDICT(D -> print (I)) = FIRST(print) = { print }
+            // PREDICT(D -> print (I)) = FIRST(print) = { print }
+            // <stat> ::= print ({exprlist_var = invokestatic_opcode} <exprlist>) {emit(GOto)}
             case Tag.PRINT:
                 match(Tag.PRINT);
                 match(Token.lpt.tag);
@@ -136,7 +142,8 @@ public class Translator {
                 code.emit(OpCode.GOto, lnext);
                 break;
 
-            //PREDICT(D -> read (E) ) = FIRST(read) = { read }
+            // PREDICT(D -> read (E) ) = FIRST(read) = { read }
+            // <stat> ::= read ( {idlist_var = read_var} <idlist>) {emit(GOto)}
             case Tag.READ:
                 match(Tag.READ);
                 match(Token.lpt.tag);
@@ -145,7 +152,8 @@ public class Translator {
                 code.emit(OpCode.GOto, lnext);
                 break;
 
-            //PREDICT(D -> while (G) D) = FIRST(while) = { while }
+            // PREDICT(D -> while (G) D) = FIRST(while) = { while }
+            // <stat> ::= 
             case Tag.WHILE:
                 match(Tag.WHILE);
                 match(Token.lpt.tag);
@@ -161,7 +169,8 @@ public class Translator {
                 code.emit(OpCode.GOto,lnext);
                 break;
 
-            //PREDICT(D -> if (G) D P ) = FIRST(if) = { if }
+            // PREDICT(D -> if (G) D P ) = FIRST(if) = { if }
+            // <stat> ::=
             case Tag.IF:
                 match(Tag.IF);
                 match(Token.lpt.tag);
@@ -174,7 +183,8 @@ public class Translator {
                 statp(if_cond_false, lnext);
                 break; 
 
-            //PREDICT(D -> { B }) = FIRST({) = { { }
+            // PREDICT(D -> { B }) = FIRST({) = { { }
+            // <stat> ::= { statlist_val = lnext <statlist> }
             case '{':
                 match(Token.lpg.tag);
                 statlist(lnext);
@@ -190,13 +200,15 @@ public class Translator {
     public void statp(int lfalse, int lnext){
         switch(look.tag){
 
-            //PREDICT(P -> end) = FIRST(end) = { end }
+            // PREDICT(P -> end) = FIRST(end) = { end }
+            // <statp> ::= end {emitLabel(lfalse)}
             case Tag.END:
                 match(Tag.END);
                 code.emitLabel(lfalse);
                 break;
 
-            //PREDICT(P -> else D end) = FIRST(else) = { else }
+            // PREDICT(P -> else D end) = FIRST(else) = { else }
+            // <statp> ::= else {emitLabel(lfalse)} {stat_val = lnext} <stat> end
             case Tag.ELSE:
                 match(Tag.ELSE);
                 code.emitLabel(lfalse);
@@ -210,7 +222,8 @@ public class Translator {
         }
     }
 
-    //PREDICT(E -> MF) = FIRST(M) = { ID }
+    // PREDICT(E -> MF) = FIRST(M) = { ID }
+    // <idlist> ::= 
     public void idlist(int readMode){
         switch(look.tag){
 
@@ -235,7 +248,8 @@ public class Translator {
     public void idlistp(int readMode, int previousVarAddress){
         switch(look.tag){
 
-            //PREDICT(F -> ,MF) = FIRST(,) = {,}
+            // PREDICT(F -> ,MF) = FIRST(,) = {,}
+            // <idlistp> ::= 
             case ',':
                 match(Token.comma.tag);
                 if (look.tag==Tag.ID) {
@@ -255,7 +269,8 @@ public class Translator {
                 }
                 break;
 
-            //PREDICT(F -> eps) = FOLLOW(F) = { $, ;, ), end, else, } } 
+            // PREDICT(F -> eps) = FOLLOW(F) = { $, ;, ), end, else, } } 
+            // <idlistp> ::= {emit(read)}{emit(istore)}
             case Tag.EOF:
             case ';':
             case ')':
@@ -274,7 +289,7 @@ public class Translator {
         }
     }
 
-    //PREDICT(G -> RELOPHH) = FIRST(RELOP) = { RELOP }
+    // PREDICT(G -> RELOPHH) = FIRST(RELOP) = { RELOP }
     public void bexpr(int ltrue, int lfalse){
         switch(look.tag){
 
@@ -282,7 +297,8 @@ public class Translator {
                 String cond = (((Word) look).lexeme);
                 match(Tag.RELOP);
                 switch(cond){
-                    
+
+                    // <bexpr> ::= <expr> <expr> {emit(ifcmpeq)} {emit(GOto)}                    
                     case "==":
                         expr();
                         expr();
@@ -290,13 +306,15 @@ public class Translator {
                         code.emit(OpCode.GOto,lfalse);
                         break;
 
+                    // <bexpr> ::= <expr> <expr> {emit(ifcmplt)} {emit(GOto)} 
                     case "<":
                         expr();
                         expr();
                         code.emit(OpCode.if_icmplt, ltrue);
                         code.emit(OpCode.GOto,lfalse);
                         break;
-
+                    
+                    // <bexpr> ::= <expr> <expr> {emit(ifcmpgt)} {emit(GOto)} 
                     case ">":
                         expr();
                         expr();
@@ -304,6 +322,7 @@ public class Translator {
                         code.emit(OpCode.GOto,lfalse);
                         break;
 
+                    // <bexpr> ::= <expr> <expr> {emit(ifcmple)} {emit(GOto)} 
                     case "<=":
                         expr();
                         expr();
@@ -311,6 +330,7 @@ public class Translator {
                         code.emit(OpCode.GOto,lfalse);
                         break;
 
+                    // <bexpr> ::= <expr> <expr> {emit(ifcmpge)} {emit(GOto)} 
                     case ">=":
                         expr();
                         expr();
@@ -318,6 +338,7 @@ public class Translator {
                         code.emit(OpCode.GOto,lfalse);
                         break;
 
+                    // <bexpr> ::= <expr> <expr> {emit(ifcmpne)} {emit(GOto)} 
                     case "<>":
                         expr();
                         expr();
@@ -337,7 +358,8 @@ public class Translator {
     public void expr(){
         switch(look.tag){
 
-            //PREDICT(H -> +(I)) = FIRST(+) = { + }
+            // PREDICT(H -> +(I)) = FIRST(+) = { + }
+            // <expr> ::= + ( {exprlist_val = iadd_value} <exprlist> )
             case '+':
                 match(Token.plus.tag);
                 match(Token.lpt.tag);
@@ -345,7 +367,8 @@ public class Translator {
                 match(Token.rpt.tag);
                 break;
 
-            //PREDICT(H -> -HH) = FIRST(-) = { - }
+            // PREDICT(H -> -HH) = FIRST(-) = { - }
+            // <expr> ::= - <expr> <expr> {emit(isub) }
             case '-':
                 match(Token.minus.tag);
                 expr();
@@ -353,7 +376,8 @@ public class Translator {
                 code.emit(OpCode.isub);
                 break;
 
-            //PREDICT(H -> *(I)) = FIRST(*) = { * }
+            // PREDICT(H -> *(I)) = FIRST(*) = { * }
+            // <expr> ::= * ( {exprlist_val = imul_value} <exprlist> )
             case '*':
                 match(Token.mult.tag);
                 match(Token.lpt.tag);
@@ -361,7 +385,8 @@ public class Translator {
                 match(Token.rpt.tag);
                 break;
 
-            //PREDICT(H -> /HH) = FIRST(/) = { / }
+            // PREDICT(H -> /HH) = FIRST(/) = { / }
+            // <expr> ::= / <expr> <expr> {emit(idiv)}
             case '/':
                 match(Token.div.tag);
                 expr();
@@ -369,13 +394,15 @@ public class Translator {
                 code.emit(OpCode.idiv);
                 break; 
 
-            //PREDICT(H -> NUM) = FIRST(NUM) = { NUM }
+            // PREDICT(H -> NUM) = FIRST(NUM) = { NUM }
+            // <expr> ::= {emit(ldc)} NUM
             case Tag.NUM:
                 code.emit(OpCode.ldc,((NumberTok) look).num);   //emit(NUM)
                 match(Tag.NUM);
                 break;
 
-            //PREDICT(H -> ID) = FIRST(ID) = { ID }
+            // PREDICT(H -> ID) = FIRST(ID) = { ID }
+            // <expr> ::= ID {emit(iload)}
             case Tag.ID:
                 if (look.tag==Tag.ID) {
                     int id_addr = st.lookupAddress(((Word)look).lexeme);
@@ -394,7 +421,8 @@ public class Translator {
         }
     }
 
-    //PREDICT(I -> HL) = FIRST(H) = { ID, +, -, *, / NUM } 
+    // PREDICT(I -> HL) = FIRST(H) = { ID, +, -, *, / NUM } 
+    // <exprlist> ::= <expr> {emit(print)} {exprlistp_val = pcode} <exprlistp>
     public void exprlist(OpCode pcode){
         switch(look.tag){
 
@@ -420,7 +448,8 @@ public class Translator {
     public void exprlistp(OpCode pcode){
         switch(look.tag){
 
-            //PREDICT(L -> ,HL) = FIRST(,) = { , }
+            // PREDICT(L -> ,HL) = FIRST(,) = { , }
+            // <exprlistp> ::= , <expr> {emit(pcode)} <exprlistp>
             case ',':
                 match(Token.comma.tag);
                 expr();
@@ -432,7 +461,8 @@ public class Translator {
                 exprlistp(pcode);
                 break;
 
-            //PREDICT(L -> eps) = FOLLOW(L) = { ) }
+            // PREDICT(L -> eps) = FOLLOW(L) = { ) }
+            // <exprlistp> ::= eps
             case ')':
                 break;
 
