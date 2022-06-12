@@ -33,6 +33,7 @@ public class Evaluator {
     }
 
     // PREDICT(S->E) = FIRST(E) = {(,NUM} 
+    // <start> ::= <expr> EOF {print(expr.val)}
     public void start() { 
 	    int expr_val = 0;
         switch(look.tag) {
@@ -55,6 +56,7 @@ public class Evaluator {
     }
 
     // PREDICT(E->TE') = FIRST(T) = {(,NUM}
+    // <expr> ::= <term> {exprp.i = term.val} <exprp>{expr.val = exprp.val}
     private int expr() { 
 	    int term_val, exprp_val = 0;
         switch(look.tag) {
@@ -81,6 +83,7 @@ public class Evaluator {
         switch (look.tag) {
             
             // PREDICT(E'->+TE') = FIRST(+TE') = FIRST(+) = {+}
+            // <exprp> ::= + <term> {exprp1.i = exprp.i + term.val} <exprp1> {exprp.val = exprp1.val}
             case '+' : 
                 match(Token.plus.tag);
                 term_val = term();
@@ -88,6 +91,7 @@ public class Evaluator {
                 break;
 
             // PREDICT(E'->-TE') = FIRST(-TE') = FIRST(-) = {-}
+            // <exprp> ::= - <term> {exprp1.i = exprp.i - term.val} <exprp1> {exprp.val = exprp1.val} 
             case '-':
                 match(Token.minus.tag);
                 term_val = term();
@@ -95,6 +99,7 @@ public class Evaluator {
                 break; 
 
             // PREDICT(E'->eps) = FOLLOW(E') = {$,)} */
+            // <exprp> ::= eps {exprp.val = exprp.i}
             case ')':
                 exprp_val = exprp_i;
                 break;
@@ -110,6 +115,7 @@ public class Evaluator {
     }
 
     // PREDICT(T -> FT') = FIRST(FT') = FIRST(F) = {(,NUM}
+    // <term> ::= <fact> {termp.i = fact.val} <termp> {term.val = termp.val}
     private int term() {
         int fact_val, termp_val = 0;
         switch(look.tag) {
@@ -135,6 +141,7 @@ public class Evaluator {
         switch(look.tag){
 
             // PREDICT(T'->*FT') = FIRST(*FT') = FIRST(*) = {*}
+            // <termp> ::= * <fact> {termp1.i = termp.i * fact.val} <termp1> {termp.val=termp1.val}
             case '*':
                 match(Token.mult.tag);
                 fact_val = fact();
@@ -142,6 +149,7 @@ public class Evaluator {
                 break;
 
             // PREDICT(T'->/FT') = FIRST(/FT') = FIRST(/) = {/}
+            // <termp> ::= / <fact> {termp1.i = termp.i / fact.val} <termp1> {termp.val=termp1.val}
             case '/':
                 match(Token.div.tag);
                 fact_val = fact();
@@ -149,6 +157,7 @@ public class Evaluator {
                 break;
 
             // PREDICT(T'->eps) = FOLLOW(T') = {$,+,-,)}
+            // <termp> ::= eps {termp.val = termp.i}
             case '+':
                 termp_val = termp_i;
                 break;
@@ -176,13 +185,15 @@ public class Evaluator {
         switch(look.tag){
 
             // PREDICT(F->(E)) = FIRST((E)) = FIRST(() = {(}
+            // <fact> ::= ( <expr> ) {fact.val = expr.val}
             case '(':
                 match(Token.lpt.tag);
                 fact_val = expr();
                 match(Token.rpt.tag);
                 break;
             
-                // PREDICT(F->NUM) = FIRST(NUM) = {NUM}
+            // PREDICT(F->NUM) = FIRST(NUM) = {NUM}
+            // <fact> ::= NUM {fact.val = NUM.value}
             case Tag.NUM:
                 NumberTok n = (NumberTok) look;
                 fact_val = n.num;
