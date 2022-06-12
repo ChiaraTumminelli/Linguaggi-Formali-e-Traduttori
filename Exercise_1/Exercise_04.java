@@ -15,11 +15,11 @@ public class Exercise_04 {
     }
 
     public static boolean isAtoK(char ch){
-        return (ch >= 65 && ch <= 75)||(ch >= 97 && ch <= 107);
+        return (ch >= 65 && ch <= 75);
     }
 
     public static boolean isLtoZ(char ch){
-        return (ch >= 76 && ch <= 90) || (ch >= 108 && ch <= 122);
+        return (ch >= 76 && ch <= 90);
     }
 
     public static boolean scan(String s){
@@ -96,7 +96,7 @@ public class Exercise_04 {
                     break;
 
                 case 6:
-                    if (Character.isLetter(ch))
+                    if (isAtoK(ch) || isLtoZ(ch))
                         state = 5;
                     else if (ch == ' ')
                         state = 6;
@@ -104,7 +104,6 @@ public class Exercise_04 {
                         state = -1;
                     break;
             }    
-            
         }
         return (state == 5) || (state == 6);
     }
