@@ -11,8 +11,8 @@ public class Translator {
     private BufferedReader pbr;
     private Token look;
 
-    public final static int READ_VAR = 0;
-    public final static int PRINT_VAR = 1;
+    public final static int READ_VAR = 0;       // Constant used in the toJasmin method in the Instruction class
+    public final static int PRINT_VAR = 1;      // Constant used in the toJasmin method in the Instruction class
     public final static int ASSIGN_VAR = 2;
 
     SymbolTable st = new SymbolTable();

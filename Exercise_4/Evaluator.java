@@ -35,7 +35,7 @@ public class Evaluator {
     // PREDICT(S->E) = FIRST(E) = {(,NUM} 
     // <start> ::= <expr> EOF {print(expr.val)}
     public void start() { 
-	int expr_val = 0;
+	    int expr_val = 0;
         switch(look.tag) {
             
             case '(':
@@ -58,7 +58,7 @@ public class Evaluator {
     // PREDICT(E->TE') = FIRST(T) = {(,NUM}
     // <expr> ::= <term> {exprp.i = term.val} <exprp>{expr.val = exprp.val}
     private int expr() { 
-	int term_val, exprp_val = 0;
+	    int term_val, exprp_val = 0;
         switch(look.tag) {
             
             case '(':
@@ -79,7 +79,7 @@ public class Evaluator {
     }
 
     private int exprp(int exprp_i) {
-	int term_val, exprp_val = 0;
+	    int term_val, exprp_val = 0;
         switch (look.tag) {
             
             // PREDICT(E'->+TE') = FIRST(+TE') = FIRST(+) = {+}

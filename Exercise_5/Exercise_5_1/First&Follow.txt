@@ -145,5 +145,3 @@ PREDICT(L -> eps) = FOLLOW(L) = { ) }
 --------------------------------------------------------------------------------------
 
 It is a LL(1) grammar, because intersections of predict sets are all empty. 
-
-
