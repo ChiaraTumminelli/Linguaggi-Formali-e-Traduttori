@@ -25,3 +25,4 @@
 ![LFT_Lab2122_page-0021](https://user-images.githubusercontent.com/61294929/173155981-fe92b091-7ede-4645-8ba5-8d52ffa6540b.jpg)
 ![LFT_Lab2122_page-0022](https://user-images.githubusercontent.com/61294929/173155985-67d738a4-4d8c-443d-8d58-a399fd0123a4.jpg)
 ![LFT_Lab2122_page-0023](https://user-images.githubusercontent.com/61294929/173155992-30d164e4-41a3-46ee-befc-ab167d8c6054.jpg)
+![Screenshot_20220616_154745](https://user-images.githubusercontent.com/61294929/174084385-8885fdb3-5c1f-44e1-8c16-73ad41b2aeb5.png)
