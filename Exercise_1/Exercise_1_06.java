@@ -34,18 +34,18 @@ public class Exercise_1_06 {
             
             case 0:
                 if (isEven(ch))
-                    state = 2;
-                else if (isOdd(ch))
                     state = 1;
+                else if (isOdd(ch))
+                    state = 2;
                 else 
                     state = -1;
                 break;
     
             case 1:
                 if (isOdd(ch))
-                    state = 1;
-                else if (isEven(ch))
                     state = 2;
+                else if (isEven(ch))
+                    state = 1;
                 else if (isLtoZ(ch))
                     state = 3;
                 else 
@@ -54,9 +54,9 @@ public class Exercise_1_06 {
         
             case 2: 
                 if (isEven(ch))
-                    state = 2;
-                else if (isOdd(ch))
                     state = 1;
+                else if (isOdd(ch))
+                    state = 2;
                 else if (isAtoK(ch))
                     state = 3;
                 else 

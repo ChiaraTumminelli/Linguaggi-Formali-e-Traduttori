@@ -281,8 +281,7 @@ public class Translator {
                 String cond = (((Word) look).lexeme);
                 match(Tag.RELOP);
                 switch(cond){
-
-                    // <bexpr> ::= <expr> <expr> {emit(ifcmpeq)} {emit(GOto)}                    
+                   
                     case "==":
                         expr();
                         expr();
@@ -290,7 +289,6 @@ public class Translator {
                         code.emit(OpCode.GOto,lfalse);
                         break;
 
-                    // <bexpr> ::= <expr> <expr> {emit(ifcmplt)} {emit(GOto)} 
                     case "<":
                         expr();
                         expr();
@@ -298,7 +296,6 @@ public class Translator {
                         code.emit(OpCode.GOto,lfalse);
                         break;
                     
-                    // <bexpr> ::= <expr> <expr> {emit(ifcmpgt)} {emit(GOto)} 
                     case ">":
                         expr();
                         expr();
@@ -306,7 +303,6 @@ public class Translator {
                         code.emit(OpCode.GOto,lfalse);
                         break;
 
-                    // <bexpr> ::= <expr> <expr> {emit(ifcmple)} {emit(GOto)} 
                     case "<=":
                         expr();
                         expr();
@@ -314,7 +310,6 @@ public class Translator {
                         code.emit(OpCode.GOto,lfalse);
                         break;
 
-                    // <bexpr> ::= <expr> <expr> {emit(ifcmpge)} {emit(GOto)} 
                     case ">=":
                         expr();
                         expr();
@@ -322,7 +317,6 @@ public class Translator {
                         code.emit(OpCode.GOto,lfalse);
                         break;
 
-                    // <bexpr> ::= <expr> <expr> {emit(ifcmpne)} {emit(GOto)} 
                     case "<>":
                         expr();
                         expr();

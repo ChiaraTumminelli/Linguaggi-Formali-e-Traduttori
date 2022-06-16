@@ -1,7 +1,8 @@
 package Exercise_1;
 
 /* DFA that recognizes strings containing uni serial number followed by
-** the surname of the students of T2 or T3 turn of LFT laboratory
+** the surname of the students of of course A with even uni serial number
+** or course B with odd uni serial number of LFT laboratory
 ** with uni serial number and surname reversed  */
 
 public class Exercise_1_05 {
