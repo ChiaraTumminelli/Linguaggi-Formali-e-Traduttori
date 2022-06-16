@@ -91,7 +91,6 @@ public class Translator {
         }
     }
 
-    //Auxiliary list of statements
     public void statlistp(){
         switch(look.tag){
 
@@ -115,7 +114,6 @@ public class Translator {
         }
     }
 
-    //Statements
     public void stat(int lnext){
         switch(look.tag){
 
