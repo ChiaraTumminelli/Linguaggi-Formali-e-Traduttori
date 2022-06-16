@@ -69,7 +69,7 @@ public class Translator {
         }
     }
 
-    //PREDICT(B -> DC) = FIRST(D) = { assign, print, read, while, if, { }
+    // PREDICT(B -> DC) = FIRST(D) = { assign, print, read, while, if, { }
     public void statlist(int lnext){
         switch(look.tag){
 
@@ -95,7 +95,7 @@ public class Translator {
     public void statlistp(){
         switch(look.tag){
 
-            //PREDICT(C -> ;DC) = FIRST(;) = {;}
+            // PREDICT(C -> ;DC) = FIRST(;) = {;}
             case ';':
                 match(Token.semicolon.tag);
                 int lnext_stat = code.newLabel();
@@ -104,7 +104,7 @@ public class Translator {
                 statlistp();
                 break;  
                 
-            //PREDICT(C -> eps) = FOLLOW(C) = { $, } }
+            // PREDICT(C -> eps) = FOLLOW(C) = { $, } }
             case Tag.EOF:
             case '}':
                 break;
@@ -118,7 +118,7 @@ public class Translator {
     public void stat(int lnext){
         switch(look.tag){
 
-            //PREDICT(D -> assign H to E) = FIRST(assign) = { assign }
+            // PREDICT(D -> assign H to E) = FIRST(assign) = { assign }
             case Tag.ASSIGN:
                 match(Tag.ASSIGN);
                 expr();
@@ -127,7 +127,7 @@ public class Translator {
                 code.emit(OpCode.GOto, lnext);
                 break;
 
-            //PREDICT(D -> print (I)) = FIRST(print) = { print }
+            // PREDICT(D -> print (I)) = FIRST(print) = { print }
             case Tag.PRINT:
                 match(Tag.PRINT);
                 match(Token.lpt.tag);
@@ -136,7 +136,7 @@ public class Translator {
                 code.emit(OpCode.GOto, lnext);
                 break;
 
-            //PREDICT(D -> read (E) ) = FIRST(read) = { read }
+            // PREDICT(D -> read (E) ) = FIRST(read) = { read }
             case Tag.READ:
                 match(Tag.READ);
                 match(Token.lpt.tag);
@@ -145,7 +145,7 @@ public class Translator {
                 code.emit(OpCode.GOto, lnext);
                 break;
 
-            //PREDICT(D -> while (G) D) = FIRST(while) = { while }
+            // PREDICT(D -> while (G) D) = FIRST(while) = { while }
             case Tag.WHILE:
                 match(Tag.WHILE);
                 match(Token.lpt.tag);
@@ -161,7 +161,7 @@ public class Translator {
                 code.emit(OpCode.GOto,lnext);
                 break;
 
-            //PREDICT(D -> if (G) D P ) = FIRST(if) = { if }
+            // PREDICT(D -> if (G) D P ) = FIRST(if) = { if }
             case Tag.IF:
                 match(Tag.IF);
                 match(Token.lpt.tag);
@@ -174,7 +174,7 @@ public class Translator {
                 statp(if_cond_false, lnext);
                 break; 
 
-            //PREDICT(D -> { B }) = FIRST({) = { { }
+            // PREDICT(D -> { B }) = FIRST({) = { { }
             case '{':
                 match(Token.lpg.tag);
                 statlist(lnext);
@@ -190,13 +190,13 @@ public class Translator {
     public void statp(int lfalse, int lnext){
         switch(look.tag){
 
-            //PREDICT(P -> end) = FIRST(end) = { end }
+            // PREDICT(P -> end) = FIRST(end) = { end }
             case Tag.END:
                 match(Tag.END);
                 code.emitLabel(lfalse);
                 break;
 
-            //PREDICT(P -> else D end) = FIRST(else) = { else }
+            // PREDICT(P -> else D end) = FIRST(else) = { else }
             case Tag.ELSE:
                 match(Tag.ELSE);
                 code.emitLabel(lfalse);
@@ -210,7 +210,7 @@ public class Translator {
         }
     }
 
-    //PREDICT(E -> MF) = FIRST(M) = { ID }
+    // PREDICT(E -> MF) = FIRST(M) = { ID }
     public void idlist(int readMode){
         switch(look.tag){
 
@@ -235,7 +235,7 @@ public class Translator {
     public void idlistp(int readMode, int previousVarAddress){
         switch(look.tag){
 
-            //PREDICT(F -> ,MF) = FIRST(,) = {,}
+            // PREDICT(F -> ,MF) = FIRST(,) = {,}
             case ',':
                 match(Token.comma.tag);
                 if (look.tag==Tag.ID) {
@@ -255,7 +255,7 @@ public class Translator {
                 }
                 break;
 
-            //PREDICT(F -> eps) = FOLLOW(F) = { $, ;, ), end, else, } } 
+            // PREDICT(F -> eps) = FOLLOW(F) = { $, ;, ), end, else, } } 
             case Tag.EOF:
             case ';':
             case ')':
@@ -277,14 +277,14 @@ public class Translator {
     public void bexpr(int ltrue, int lfalse){
         switch(look.tag){
 
-            //PREDICT(G -> N) = FIRST(N) = { and, or, not }
+            // PREDICT(G -> N) = FIRST(N) = { and, or, not }
             case Tag.AND:
             case Tag.OR:
             case '!':
                 bool(ltrue,lfalse);
                 break;
 
-            //PREDICT(G -> O) = FIRST(O) = { relop }
+            // PREDICT(G -> O) = FIRST(O) = { relop }
             case Tag.RELOP:
                 cond(ltrue,lfalse);
                 break;
@@ -388,12 +388,12 @@ public class Translator {
     public void boolp(int ltrue, int lfalse){
         switch(look.tag){
 
-            //PREDICT(Q -> O) = FIRST(O) = { relop }
+            // PREDICT(Q -> O) = FIRST(O) = { relop }
             case Tag.RELOP:
                 cond(ltrue,lfalse);
                 break;
 
-            //PREDICT(Q -> N) = FIRST(N) = { and, or, not}
+            // PREDICT(Q -> N) = FIRST(N) = { and, or, not}
             case Tag.AND:
             case Tag.OR:
             case '!':
@@ -405,7 +405,7 @@ public class Translator {
     public void expr(){
         switch(look.tag){
 
-            //PREDICT(H -> +(I)) = FIRST(+) = { + }
+            // PREDICT(H -> +(I)) = FIRST(+) = { + }
             case '+':
                 match(Token.plus.tag);
                 match(Token.lpt.tag);
@@ -413,7 +413,7 @@ public class Translator {
                 match(Token.rpt.tag);
                 break;
 
-            //PREDICT(H -> -HH) = FIRST(-) = { - }
+            // PREDICT(H -> -HH) = FIRST(-) = { - }
             case '-':
                 match(Token.minus.tag);
                 expr();
@@ -421,7 +421,7 @@ public class Translator {
                 code.emit(OpCode.isub);
                 break;
 
-            //PREDICT(H -> *(I)) = FIRST(*) = { * }
+            // PREDICT(H -> *(I)) = FIRST(*) = { * }
             case '*':
                 match(Token.mult.tag);
                 match(Token.lpt.tag);
@@ -429,7 +429,7 @@ public class Translator {
                 match(Token.rpt.tag);
                 break;
 
-            //PREDICT(H -> /HH) = FIRST(/) = { / }
+            // PREDICT(H -> /HH) = FIRST(/) = { / }
             case '/':
                 match(Token.div.tag);
                 expr();
@@ -437,13 +437,13 @@ public class Translator {
                 code.emit(OpCode.idiv);
                 break; 
 
-            //PREDICT(H -> NUM) = FIRST(NUM) = { NUM }
+            // PREDICT(H -> NUM) = FIRST(NUM) = { NUM }
             case Tag.NUM:
                 code.emit(OpCode.ldc,((NumberTok) look).num);   
                 match(Tag.NUM);
                 break;
 
-            //PREDICT(H -> ID) = FIRST(ID) = { ID }
+            // PREDICT(H -> ID) = FIRST(ID) = { ID }
             case Tag.ID:
                 if (look.tag==Tag.ID) {
                     int id_addr = st.lookupAddress(((Word)look).lexeme);
@@ -462,7 +462,7 @@ public class Translator {
         }
     }
 
-    //PREDICT(I -> HL) = FIRST(H) = { ID, +, -, *, / NUM } 
+    // PREDICT(I -> HL) = FIRST(H) = { ID, +, -, *, / NUM } 
     public void exprlist(OpCode pcode){
         switch(look.tag){
 
@@ -488,7 +488,7 @@ public class Translator {
     public void exprlistp(OpCode pcode){
         switch(look.tag){
 
-            //PREDICT(L -> ,HL) = FIRST(,) = { , }
+            // PREDICT(L -> ,HL) = FIRST(,) = { , }
             case ',':
                 match(Token.comma.tag);
                 expr();
@@ -500,7 +500,7 @@ public class Translator {
                 exprlistp(pcode);
                 break;
 
-            //PREDICT(L -> eps) = FOLLOW(L) = { ) }
+            // PREDICT(L -> eps) = FOLLOW(L) = { ) }
             case ')':
                 break;
 
