@@ -1,2 +1,35 @@
-read(a);
-print(+(a,1))
+/*      
+**        GRAMMAR TO USE:
+**
+**        <prog>       ::= <statlist> EOF
+**        <statlist>   ::= <stat> <statlistp>
+**        <statlistp>  ::= ; <stat> <statlistp> 
+**                        | eps                                                                                                
+**        <stat>       ::= assign <expr> to <idlist> 
+**                        | print ( <exprlist> ) 
+**                        | read ( <idlist> ) 
+**                        | while ( <bexpr> ) <stat> 
+**                        | if ( <bexpr> ) <stat> <statp> 
+**                        | { <statlist> }
+**        <statp>      ::= end
+                          | else <stat> end
+**        <idlist>     ::= ID <idlistp>
+**        <idlistp>    ::= , ID <idlistp> 
+**                        | eps                                                                                                   
+**        <bexpr>      ::= RELOP <expr> <expr>
+**        <expr>       ::= + ( <exprlist> ) 
+**                        | - <expr> <expr> 
+**                        | * ( <exprlist> ) 
+**                        | /  <expr> <expr>  
+**                        | NUM 
+**                        | ID 
+**        <exprlist>   ::= <expr> <exprlistp>
+**        <exprlistp>  ::= , <expr> <exprlistp>
+**                        | eps                           
+*/
+
+
+//EXAMPLE HERE: 
+read(x,y);
+print(+(5,5));
+assign -7 7 to y,z

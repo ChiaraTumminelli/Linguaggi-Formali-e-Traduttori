@@ -32,14 +32,24 @@
 .limit locals 256
 	invokestatic Output/read()I
 	istore 0
+	invokestatic Output/read()I
+	istore 1
 	goto L1
 L1:
-	iload 0
-	ldc 1
+	ldc 5
+	ldc 5
 	iadd 
 	invokestatic Output/print(I)V
 	goto L2
 L2:
+	ldc 7
+	ldc 7
+	isub 
+	dup 0
+	istore 1
+	istore 2
+	goto L3
+L3:
 	goto L0
 L0:
 	return
