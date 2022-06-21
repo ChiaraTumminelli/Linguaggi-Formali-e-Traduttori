@@ -55,10 +55,8 @@ L3:
 	invokestatic Output/print(I)V
 	goto L2
 L4:
-	ldc 3
-	dup 0
-	istore 1
-	istore 2
+	iload 0
+	invokestatic Output/print(I)V
 	goto L2
 L2:
 	goto L0
