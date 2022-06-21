@@ -43,7 +43,7 @@ public class Instruction {
             case ifne : temp = "\tifne L" + operand + "\n"; break;
             case GOto : temp = "\tgoto L" + operand + "\n" ; break;
             case label : temp = "L" + operand + ":\n"; break;
-            case dup : temp ="\t dup" + operand + ":\n"; break;
+            case dup : temp ="\tdup " + operand + "\n"; break;
         }
     return temp;
     }
